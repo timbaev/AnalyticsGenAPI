@@ -27,4 +27,11 @@ struct DefaultAnalyticsTrackerService: AnalyticsTrackerService {
                 return AnalyticsTracker(name: form.name).save(on: request).toForm()
         }
     }
+
+    func fetch(on request: Request) throws -> Future<[AnalyticsTracker.Form]> {
+        return SwifQL.select(AnalyticsTracker.table.*)
+            .from(AnalyticsTracker.table)
+            .execute(on: request, as: .psql)
+            .all(decoding: AnalyticsTracker.Form.self)
+    }
 }
