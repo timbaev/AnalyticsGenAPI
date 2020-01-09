@@ -15,6 +15,7 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
 
     var middleware = MiddlewareConfig()
 
+    middleware.use(FileMiddleware.self)
     middleware.use(ErrorMiddleware.self)
 
     services.register(middleware)
@@ -73,4 +74,10 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
     // MARK: - NIOServerConfig
 
     services.register(NIOServerConfig.default(maxBodySize: 20_000_000))
+
+    // MARK: - LeafProvider
+
+    try services.register(LeafProvider())
+
+    config.prefer(LeafRenderer.self, for: ViewRenderer.self)
 }

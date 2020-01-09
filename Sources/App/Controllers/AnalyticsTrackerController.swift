@@ -25,8 +25,12 @@ final class AnalyticsTrackerController {
         return try self.analyticsTrackerService.create(on: request, form: form)
     }
 
-    func fetch(_ request: Request) throws -> Future<[AnalyticsTracker.Form]> {
-        return try self.analyticsTrackerService.fetch(on: request)
+    func fetch(_ request: Request) throws -> Future<View> {
+        return try self.analyticsTrackerService.fetch(on: request).flatMap { analyticsTrackerForms in
+            let context = AnalyticsTrackerContext(analyticsTrackers: analyticsTrackerForms, columns: ["name"])
+
+            return try request.view().render("analyticsTrackerList", context)
+        }
     }
 }
 
