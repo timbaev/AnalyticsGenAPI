@@ -7,4 +7,9 @@
 
 import Foundation
 
-enum AGServices { }
+enum AGServices {
+
+    // MARK: - Instance Properties
+
+    static let analyticsTrackerService: AnalyticsTrackerService = DefaultAnalyticsTrackerService()
+}

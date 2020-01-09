@@ -56,10 +56,10 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
 
     var migrations = MigrationConfig()
 
-    migrations.add(model: AnalyticsService.self, database: .psql)
+    migrations.add(model: AnalyticsTracker.self, database: .psql)
     migrations.add(model: AnalyticsEvent.self, database: .psql)
     migrations.add(model: AnalyticsParameter.self, database: .psql)
-    migrations.add(model: AnalyticsServiceEvent.self, database: .psql)
+    migrations.add(model: AnalyticsTrackerEvent.self, database: .psql)
 
     services.register(migrations)
 
