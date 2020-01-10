@@ -25,7 +25,11 @@ final class AnalyticsTrackerController {
         return try self.analyticsTrackerService.create(on: request, form: form)
     }
 
-    func fetch(_ request: Request) throws -> Future<View> {
+    func fetch(_ request: Request) throws -> Future<[AnalyticsTracker.Form]> {
+        return try self.analyticsTrackerService.fetch(on: request)
+    }
+
+    func render(_ request: Request) throws -> Future<View> {
         return try self.analyticsTrackerService.fetch(on: request).flatMap { analyticsTrackerForms in
             let context = AnalyticsTrackerContext(analyticsTrackers: analyticsTrackerForms, columns: ["name"])
 
@@ -45,5 +49,6 @@ extension AnalyticsTrackerController: RouteCollection {
 
         group.post(AnalyticsTracker.Form.self, use: self.create)
         group.get(use: self.fetch)
+        group.get("render", use: self.render)
     }
 }
