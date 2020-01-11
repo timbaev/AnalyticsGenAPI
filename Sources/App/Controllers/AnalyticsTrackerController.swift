@@ -36,6 +36,12 @@ final class AnalyticsTrackerController {
             return try request.view().render("analyticsTrackerList", context)
         }
     }
+
+    func fetchEvents(_ request: Request) throws -> Future<[AnalyticsEvent.Form]> {
+        return try request.parameters.next(AnalyticsTracker.self).flatMap { tracker in
+            return try self.analyticsTrackerService.fetchEvents(on: request, tracker: tracker)
+        }
+    }
 }
 
 // MARK: - RouteCollection
@@ -50,5 +56,6 @@ extension AnalyticsTrackerController: RouteCollection {
         group.post(AnalyticsTracker.Form.self, use: self.create)
         group.get(use: self.fetch)
         group.get("render", use: self.render)
+        group.get(AnalyticsTracker.parameter, "events", use: self.fetchEvents)
     }
 }

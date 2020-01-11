@@ -7,6 +7,7 @@
 
 import Vapor
 import FluentPostgreSQL
+import SwifQL
 
 struct AnalyticsTrackerEvent: PostgreSQLPivot {
 
@@ -61,3 +62,7 @@ extension AnalyticsTrackerEvent: Migration {
         })
     }
 }
+
+// MARK: - Tableable
+
+extension AnalyticsTrackerEvent: Tableable { }

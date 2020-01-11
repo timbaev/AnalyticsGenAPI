@@ -34,4 +34,13 @@ struct DefaultAnalyticsTrackerService: AnalyticsTrackerService {
             .execute(on: request, as: .psql)
             .all(decoding: AnalyticsTracker.Form.self)
     }
+
+    func fetchEvents(on request: Request, tracker: AnalyticsTracker) throws -> Future<[AnalyticsEvent.Form]> {
+        return try SwifQL.select(\AnalyticsEvent.id, \AnalyticsEvent.name, \AnalyticsEvent.description)
+            .from(AnalyticsTrackerEvent.table)
+            .join(.inner, AnalyticsEvent.table, on: \AnalyticsTrackerEvent.eventID == \AnalyticsEvent.id)
+            .where(\AnalyticsTrackerEvent.trackerID == tracker.requireID())
+            .execute(on: request, as: .psql)
+            .all(decoding: AnalyticsEvent.Form.self)
+    }
 }
