@@ -14,4 +14,10 @@ public func routes(_ router: Router) throws {
     let analyticsEventController = AnalyticsEventController(analyticsEventService: AGServices.analyitcsEventService)
 
     try router.register(collection: analyticsEventController)
+
+    // MARK: - AnalyticsParameterController
+
+    let analyticsParameterController = AnalyticsParameterController(analyticsParameterService: AGServices.analyticsParametersSevice)
+
+    try router.register(collection: analyticsParameterController)
 }

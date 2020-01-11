@@ -13,4 +13,5 @@ enum AGServices {
 
     static let analyticsTrackerService: AnalyticsTrackerService = DefaultAnalyticsTrackerService()
     static let analyitcsEventService: AnalyticsEventService = DefaultAnalyticsEventService()
+    static let analyticsParametersSevice: AnalyticsParameterService = DefaultAnalyticsParameterService()
 }
