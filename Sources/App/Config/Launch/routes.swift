@@ -8,4 +8,10 @@ public func routes(_ router: Router) throws {
     let analyticsTrackerController = AnalyticsTrackerController(analyticsTrackerService: AGServices.analyticsTrackerService)
 
     try router.register(collection: analyticsTrackerController)
+
+    // MARK: - AnalyticsEventController
+
+    let analyticsEventController = AnalyticsEventController(analyticsEventService: AGServices.analyitcsEventService)
+
+    try router.register(collection: analyticsEventController)
 }
