@@ -32,7 +32,8 @@ struct DefaultAnalyticsTrackerService: AnalyticsTrackerService {
         return SwifQL.select(AnalyticsTracker.table.*)
             .from(AnalyticsTracker.table)
             .execute(on: request, as: .psql)
-            .all(decoding: AnalyticsTracker.Form.self)
+            .all(decoding: AnalyticsTracker.self)
+            .flatMap { trackers in try trackers.map { try $0.toForm(on: request) }.flatten(on: request) }
     }
 
     func fetchEvents(on request: Request, tracker: AnalyticsTracker) throws -> Future<[AnalyticsEvent.Form]> {
