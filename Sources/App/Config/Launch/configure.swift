@@ -62,6 +62,10 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
     migrations.add(model: AnalyticsParameter.self, database: .psql)
     migrations.add(model: AnalyticsTrackerEvent.self, database: .psql)
 
+    migrations.add(migration: AnalyticsParameter.ParameterType.self, database: .psql)
+    migrations.add(migration: AnalyticsTrackerMigration17022020.self, database: .psql)
+    migrations.add(migration: AnalyticsParameterMigration17022020.self, database: .psql)
+
     services.register(migrations)
 
     // MARK: - Commands

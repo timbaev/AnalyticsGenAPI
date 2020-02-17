@@ -13,5 +13,4 @@ protocol AnalyticsTrackerService {
 
     func create(on request: Request, form: AnalyticsTracker.Form) throws -> Future<AnalyticsTracker.Form>
     func fetch(on request: Request) throws -> Future<[AnalyticsTracker.Form]>
-    func fetchEvents(on request: Request, tracker: AnalyticsTracker) throws -> Future<[AnalyticsEvent.Form]>
 }

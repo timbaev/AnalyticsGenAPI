@@ -33,9 +33,17 @@ struct DefaultAnalyticsParameterService: AnalyticsParameterService {
                 throw Abort(.badRequest, reason: "Parameter with name '\(form.name)' in event already exists")
             }
 
-            return AnalyticsParameter(name: form.name, description: form.description, analyticsEventID: form.eventID)
-                .save(on: request)
-                .toForm()
+            guard let type = AnalyticsParameter.ParameterType(rawValue: form.type) else {
+                throw Abort(.badRequest, reason: "Incorrect type")
+            }
+
+            return AnalyticsParameter(
+                name: form.name,
+                description: form.description,
+                type: type,
+                isOptional: form.isOptional,
+                analyticsEventID: form.eventID
+            ).save(on: request).toForm()
         }
     }
 }

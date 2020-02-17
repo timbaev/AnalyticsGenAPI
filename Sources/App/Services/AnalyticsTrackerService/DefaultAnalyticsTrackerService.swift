@@ -24,7 +24,7 @@ struct DefaultAnalyticsTrackerService: AnalyticsTrackerService {
                     throw Abort(.badRequest, reason: "Tracker already exists")
                 }
 
-                return AnalyticsTracker(name: form.name).save(on: request).toForm()
+                return AnalyticsTracker(name: form.name, import: form.import).save(on: request).toForm()
         }
     }
 
@@ -34,14 +34,5 @@ struct DefaultAnalyticsTrackerService: AnalyticsTrackerService {
             .execute(on: request, as: .psql)
             .all(decoding: AnalyticsTracker.self)
             .flatMap { trackers in try trackers.map { try $0.toForm(on: request) }.flatten(on: request) }
-    }
-
-    func fetchEvents(on request: Request, tracker: AnalyticsTracker) throws -> Future<[AnalyticsEvent.Form]> {
-        return try SwifQL.select(\AnalyticsEvent.id, \AnalyticsEvent.name, \AnalyticsEvent.description)
-            .from(AnalyticsTrackerEvent.table)
-            .join(.inner, AnalyticsEvent.table, on: \AnalyticsTrackerEvent.eventID == \AnalyticsEvent.id)
-            .where(\AnalyticsTrackerEvent.trackerID == tracker.requireID())
-            .execute(on: request, as: .psql)
-            .all(decoding: AnalyticsEvent.Form.self)
     }
 }

@@ -19,6 +19,8 @@ final class AnalyticsParameter: Object {
         let id: Int?
         let name: String
         let description: String
+        let type: String
+        let isOptional: Bool
         let eventID: Int
 
         // MARK: - Initializers
@@ -27,8 +29,23 @@ final class AnalyticsParameter: Object {
             self.id = analyticsParameter.id
             self.name = analyticsParameter.name
             self.description = analyticsParameter.description
+            self.type = analyticsParameter.type.rawValue
+            self.isOptional = analyticsParameter.isOptional
             self.eventID = analyticsParameter.analyticsEventID
         }
+    }
+
+    // MARK: -
+
+    enum ParameterType: String, PostgreSQLEnum, Content, PostgreSQLMigration {
+
+        // MARK: - Enumeration Cases
+
+        case int = "Int"
+        case float = "Float"
+        case double = "Double"
+        case bool = "Bool"
+        case string = "String"
     }
 
     // MARK: - Instance Properties
@@ -36,15 +53,26 @@ final class AnalyticsParameter: Object {
     var id: Int?
     var name: String
     var description: String
+    var type: ParameterType
+    var isOptional: Bool
 
     var analyticsEventID: AnalyticsEvent.ID
 
     // MARK: - Initializers
 
-    init(id: Int? = nil, name: String, description: String, analyticsEventID: AnalyticsEvent.ID) {
+    init(
+        id: Int? = nil,
+        name: String,
+        description: String,
+        type: ParameterType,
+        isOptional: Bool,
+        analyticsEventID: AnalyticsEvent.ID
+    ) {
         self.id = id
         self.name = name
         self.description = description
+        self.type = type
+        self.isOptional = isOptional
         self.analyticsEventID = analyticsEventID
     }
 }

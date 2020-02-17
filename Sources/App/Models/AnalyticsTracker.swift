@@ -18,6 +18,7 @@ final class AnalyticsTracker: Object {
 
         let id: Int?
         let name: String
+        let `import`: String
         let events: [AnalyticsEvent.Form]?
 
         // MARK: - Initializers
@@ -25,6 +26,7 @@ final class AnalyticsTracker: Object {
         init(tracker: AnalyticsTracker, events: [AnalyticsEvent.Form]? = nil) {
             self.id = tracker.id
             self.name = tracker.name
+            self.import = tracker.import
             self.events = events
         }
     }
@@ -33,12 +35,14 @@ final class AnalyticsTracker: Object {
 
     var id: Int?
     var name: String
+    var `import`: String
 
     // MARK: - Initializers
 
-    init(id: Int? = nil, name: String) {
+    init(id: Int? = nil, name: String, `import`: String) {
         self.id = id
         self.name = name
+        self.import = `import`
     }
 }
 
