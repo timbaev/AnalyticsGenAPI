@@ -28,6 +28,10 @@ final class AnalyticsTrackerController {
     func fetch(_ request: Request) throws -> Future<[AnalyticsTracker.Form]> {
         return try self.analyticsTrackerService.fetch(on: request)
     }
+
+    func fetchForGen(_ request: Request) throws -> Future<GenerationFormContent> {
+        return try self.analyticsTrackerService.fetchForGen(on: request)
+    }
 }
 
 // MARK: - RouteCollection
@@ -41,5 +45,6 @@ extension AnalyticsTrackerController: RouteCollection {
 
         group.post(AnalyticsTracker.Form.self, use: self.create)
         group.get(use: self.fetch)
+        group.get("generation", use: self.fetchForGen)
     }
 }

@@ -85,4 +85,8 @@ extension AnalyticsTracker {
             return AnalyticsTracker.Form(tracker: self, events: events)
         }
     }
+
+    func toForm() -> AnalyticsTracker.Form {
+        return AnalyticsTracker.Form(tracker: self)
+    }
 }

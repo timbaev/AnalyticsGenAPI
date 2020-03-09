@@ -42,6 +42,29 @@ final class AnalyticsEvent: Object {
         let trackerID: AnalyticsTracker.ID
     }
 
+    // MARK: -
+
+    struct GenForm: Content {
+
+        // MARK: - Instance Properties
+
+        let id: Int?
+        let name: String
+        let description: String
+        let parameters: [AnalyticsParameter.Form]
+        let trackerNames: [String]
+
+        // MARK: - Initializers
+
+        init(analyticsEvent: AnalyticsEvent, parameters: [AnalyticsParameter.Form], trackerNames: [String]) {
+            self.id = analyticsEvent.id
+            self.name = analyticsEvent.name
+            self.description = analyticsEvent.description
+            self.parameters = parameters
+            self.trackerNames = trackerNames
+        }
+    }
+
     // MARK: - Instance Properties
 
     var id: Int?
@@ -96,6 +119,22 @@ extension AnalyticsEvent {
             let parameterForms = parameters.map { AnalyticsParameter.Form(analyticsParameter: $0) }
 
             return AnalyticsEvent.Form(analyticsEvent: self, parameters: parameterForms)
+        }
+    }
+
+    func toGenForm(on request: Request) throws -> Future<AnalyticsEvent.GenForm> {
+        return try self.parameters.query(on: request).all().flatMap { parameters in
+            let parameterForms = parameters.map { AnalyticsParameter.Form(analyticsParameter: $0) }
+
+            return try self.trackers.query(on: request).all().map { trackers in
+                let trackerNames: [String] = trackers.map { $0.name }
+
+                return AnalyticsEvent.GenForm(
+                    analyticsEvent: self,
+                    parameters: parameterForms,
+                    trackerNames: trackerNames
+                )
+            }
         }
     }
 }
