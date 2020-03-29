@@ -14,7 +14,7 @@ struct DefaultAnalyticsTrackerService: AnalyticsTrackerService {
     // MARK: - AnalyticsTrackerService
 
     func create(on request: Request, form: AnalyticsTracker.Form) throws -> Future<AnalyticsTracker.Form> {
-        return SwifQL.select(AnalyticsTracker.table.*)
+        SwifQL.select(AnalyticsTracker.table.*)
             .from(AnalyticsTracker.table)
             .where(\AnalyticsTracker.name == form.name)
             .limit(1)
@@ -29,15 +29,15 @@ struct DefaultAnalyticsTrackerService: AnalyticsTrackerService {
     }
 
     func fetch(on request: Request) throws -> Future<[AnalyticsTracker.Form]> {
-        return SwifQL.select(AnalyticsTracker.table.*)
+        SwifQL.select(AnalyticsTracker.table.*)
             .from(AnalyticsTracker.table)
             .execute(on: request, as: .psql)
             .all(decoding: AnalyticsTracker.self)
-            .flatMap { trackers in try trackers.map { try $0.toForm(on: request) }.flatten(on: request) }
+            .map { trackers in trackers.map { $0.toForm() } }
     }
 
     func fetchForGen(on request: Request) throws -> Future<GenerationFormContent> {
-        return SwifQL.select(AnalyticsTracker.table.*)
+        SwifQL.select(AnalyticsTracker.table.*)
             .from(AnalyticsTracker.table)
             .execute(on: request, as: .psql).all(decoding: AnalyticsTracker.self)
             .map { trackers in

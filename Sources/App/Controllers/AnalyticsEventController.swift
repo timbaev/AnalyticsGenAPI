@@ -40,5 +40,6 @@ extension AnalyticsEventController: RouteCollection {
         let group = router.grouped("v1", "event")
 
         group.post(AnalyticsEvent.CreateForm.self, use: self.create)
+        group.get(use: self.fetch)
     }
 }
