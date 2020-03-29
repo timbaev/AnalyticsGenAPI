@@ -14,7 +14,8 @@ let package = Package(
         .package(url: "https://github.com/vapor/fluent-postgresql.git", from: "1.0.0"),
 
         // 📚 Other third-party libraries
-        .package(url: "https://github.com/MihaelIsaev/SwifQL.git", from:"0.20.1")
+        .package(url: "https://github.com/MihaelIsaev/SwifQL.git", from: "1.0.0"),
+        .package(url: "https://github.com/MihaelIsaev/SwifQLVapor.git", from: "1.0.0")
     ],
     targets: [
         .target(name: "App", dependencies: ["Leaf", "Vapor", "FluentPostgreSQL", "SwifQL", "SwifQLVapor"]),
