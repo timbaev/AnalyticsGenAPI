@@ -110,8 +110,17 @@ extension Future where T: AnalyticsParameter {
     // MARK: - Instance Methods
 
     func toForm() -> Future<AnalyticsParameter.Form> {
-        return self.map(to: AnalyticsParameter.Form.self, { parameter in
-            return AnalyticsParameter.Form(analyticsParameter: parameter)
-        })
+        self.map { $0.toForm() }
+    }
+}
+
+// MARK: -
+
+extension AnalyticsParameter {
+
+    // MARK: - Instance Methods
+
+    func toForm() -> AnalyticsParameter.Form {
+        AnalyticsParameter.Form(analyticsParameter: self)
     }
 }

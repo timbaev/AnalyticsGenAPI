@@ -19,14 +19,20 @@ final class AnalyticsEvent: Object {
         let id: Int?
         let name: String
         let description: String
+        let analyticsTrackers: [AnalyticsTracker.Form]
         let parameters: [AnalyticsParameter.Form]?
 
         // MARK: - Initializers
 
-        init(analyticsEvent: AnalyticsEvent, parameters: [AnalyticsParameter.Form]? = nil) {
+        init(
+            analyticsEvent: AnalyticsEvent,
+            analyticsTrackers: [AnalyticsTracker.Form],
+            parameters: [AnalyticsParameter.Form]? = nil
+        ) {
             self.id = analyticsEvent.id
             self.name = analyticsEvent.name
             self.description = analyticsEvent.description
+            self.analyticsTrackers = analyticsTrackers
             self.parameters = parameters
         }
     }
@@ -115,10 +121,18 @@ extension AnalyticsEvent {
     // MARK: - Instance Methods
 
     func toForm(on request: Request) throws -> Future<AnalyticsEvent.Form> {
-        return try self.parameters.query(on: request).all().map { parameters in
-            let parameterForms = parameters.map { AnalyticsParameter.Form(analyticsParameter: $0) }
+        let parametersFuture = try self.parameters.query(on: request).all()
+        let trackersFuture = try self.trackers.query(on: request).all()
 
-            return AnalyticsEvent.Form(analyticsEvent: self, parameters: parameterForms)
+        return parametersFuture.and(trackersFuture).map { parameters, trackers in
+            let parameterForms = parameters.map { $0.toForm() }
+            let trackerForms = trackers.map { $0.toForm() }
+
+            return AnalyticsEvent.Form(
+                analyticsEvent: self,
+                analyticsTrackers: trackerForms,
+                parameters: parameterForms
+            )
         }
     }
 

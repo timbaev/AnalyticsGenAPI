@@ -12,4 +12,5 @@ protocol AnalyticsEventService {
     // MARK: - Instance Methods
 
     func create(on request: Request, form: AnalyticsEvent.CreateForm) throws -> Future<AnalyticsEvent.Form>
+    func fetch(on request: Request) throws -> Future<[AnalyticsEvent.Form]>
 }

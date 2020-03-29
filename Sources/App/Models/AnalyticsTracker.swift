@@ -19,15 +19,13 @@ final class AnalyticsTracker: Object {
         let id: Int?
         let name: String
         let `import`: String
-        let events: [AnalyticsEvent.Form]?
 
         // MARK: - Initializers
 
-        init(tracker: AnalyticsTracker, events: [AnalyticsEvent.Form]? = nil) {
+        init(tracker: AnalyticsTracker) {
             self.id = tracker.id
             self.name = tracker.name
             self.import = tracker.import
-            self.events = events
         }
     }
 
@@ -63,12 +61,8 @@ extension Future where T: AnalyticsTracker {
 
     // MARK: - Instance Methods
 
-    func toForm(on request: Request) -> Future<AnalyticsTracker.Form> {
-        return self.flatMap { try $0.toForm(on: request) }
-    }
-
     func toForm() -> Future<AnalyticsTracker.Form> {
-        return self.map { AnalyticsTracker.Form(tracker: $0) }
+        self.map { $0.toForm() }
     }
 }
 
@@ -78,15 +72,7 @@ extension AnalyticsTracker {
 
     // MARK: - Instance Methods
 
-    func toForm(on request: Request) throws -> Future<AnalyticsTracker.Form> {
-        return try self.events.query(on: request).all().flatMap { events in
-            return try events.map { try $0.toForm(on: request) }.flatten(on: request)
-        }.map { events in
-            return AnalyticsTracker.Form(tracker: self, events: events)
-        }
-    }
-
     func toForm() -> AnalyticsTracker.Form {
-        return AnalyticsTracker.Form(tracker: self)
+        AnalyticsTracker.Form(tracker: self)
     }
 }

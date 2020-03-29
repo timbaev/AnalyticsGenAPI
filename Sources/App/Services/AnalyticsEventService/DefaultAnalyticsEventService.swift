@@ -34,8 +34,14 @@ struct DefaultAnalyticsEventService: AnalyticsEventService {
             return AnalyticsEvent(name: form.name, description: form.description).save(on: request).flatMap { analyticsEvent in
                 return AnalyticsTrackerEvent(trackerID: form.trackerID, eventID: try analyticsEvent.requireID())
                     .save(on: request)
-                    .transform(to: AnalyticsEvent.Form(analyticsEvent: analyticsEvent))
+                    .flatMap { _ in try analyticsEvent.toForm(on: request) }
             }
+        }
+    }
+
+    func fetch(on request: Request) throws -> Future<[AnalyticsEvent.Form]> {
+        AnalyticsEvent.query(on: request).all().flatMap { events in
+            try events.map { try $0.toForm(on: request) }.flatten(on: request)
         }
     }
 }

@@ -22,7 +22,11 @@ final class AnalyticsEventController {
     // MARK: - Instance Methods
 
     func create(_ request: Request, form: AnalyticsEvent.CreateForm) throws -> Future<AnalyticsEvent.Form> {
-        return try self.analyticsEventService.create(on: request, form: form)
+        try self.analyticsEventService.create(on: request, form: form)
+    }
+
+    func fetch(_ request: Request) throws -> Future<[AnalyticsEvent.Form]> {
+        try self.analyticsEventService.fetch(on: request)
     }
 }
 
