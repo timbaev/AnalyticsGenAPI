@@ -37,7 +37,16 @@ final class AnalyticsParameter: Object {
 
     // MARK: -
 
-    enum ParameterType: String, PostgreSQLEnum, Content, PostgreSQLMigration {
+    struct ParameterTypesForm: Content {
+
+        // MARK: - Instance Properties
+
+        let types: [String]
+    }
+
+    // MARK: -
+
+    enum ParameterType: String, PostgreSQLEnum, Content, PostgreSQLMigration, CaseIterable {
 
         // MARK: - Enumeration Cases
 
