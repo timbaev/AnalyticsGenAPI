@@ -11,5 +11,9 @@ protocol AnalyticsParameterService {
 
     // MARK: - Instance Methods
 
-    func create(on request: Request, form: AnalyticsParameter.Form) throws -> Future<AnalyticsParameter.Form>
+    func create(
+        on request: Request,
+        form: AnalyticsParameter.Form,
+        eventID: AnalyticsEvent.ID
+    ) throws -> Future<AnalyticsParameter.Form>
 }

@@ -45,7 +45,8 @@ final class AnalyticsEvent: Object {
 
         let name: String
         let description: String
-        let trackerID: AnalyticsTracker.ID
+        let trackerIDs: [AnalyticsTracker.ID]
+        let parameters: [AnalyticsParameter.Form]
     }
 
     // MARK: -

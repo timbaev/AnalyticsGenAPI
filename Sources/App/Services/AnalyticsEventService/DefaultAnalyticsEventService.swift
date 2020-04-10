@@ -12,6 +12,10 @@ import SwifQLVapor
 
 struct DefaultAnalyticsEventService: AnalyticsEventService {
 
+    // MARK: - Instance Properties
+
+    let analyticsParameterService: AnalyticsParameterService
+
     // MARK: - Instance Methods
 
     private func isEventExists(on request: Request, with name: String) -> Future<Bool> {
@@ -31,10 +35,22 @@ struct DefaultAnalyticsEventService: AnalyticsEventService {
                 throw Abort(.badRequest, reason: "Event with name '\(form.name)' already exists")
             }
 
-            return AnalyticsEvent(name: form.name, description: form.description).save(on: request).flatMap { analyticsEvent in
-                return AnalyticsTrackerEvent(trackerID: form.trackerID, eventID: try analyticsEvent.requireID())
-                    .save(on: request)
-                    .flatMap { _ in try analyticsEvent.toForm(on: request) }
+            return AnalyticsEvent(name: form.name, description: form.description)
+                .save(on: request)
+                .flatMap { analyticsEvent in
+                    let eventID = try analyticsEvent.requireID()
+
+                    let analyticsTrackerEvents = form.trackerIDs.map {
+                        AnalyticsTrackerEvent(trackerID: $0, eventID: eventID)
+                    }.map { $0.save(on: request) }.flatten(on: request)
+
+                    let parameterForms = try form.parameters.map {
+                        try self.analyticsParameterService.create(on: request, form: $0, eventID: eventID)
+                    }.flatten(on: request)
+
+                    return analyticsTrackerEvents
+                        .and(parameterForms)
+                        .transform(to: try analyticsEvent.toForm(on: request))
             }
         }
     }

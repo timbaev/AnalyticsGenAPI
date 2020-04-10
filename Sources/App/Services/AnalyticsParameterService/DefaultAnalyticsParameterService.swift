@@ -27,8 +27,12 @@ struct DefaultAnalyticsParameterService: AnalyticsParameterService {
 
     // MARK: - AnalyticsParameterService
 
-    func create(on request: Request, form: AnalyticsParameter.Form) throws -> Future<AnalyticsParameter.Form> {
-        return self.isParameterExists(on: request, with: form.name, eventID: form.eventID).flatMap { exists in
+    func create(
+        on request: Request,
+        form: AnalyticsParameter.Form,
+        eventID: AnalyticsEvent.ID
+    ) throws -> Future<AnalyticsParameter.Form> {
+        return self.isParameterExists(on: request, with: form.name, eventID: eventID).flatMap { exists in
             guard !exists else {
                 throw Abort(.badRequest, reason: "Parameter with name '\(form.name)' in event already exists")
             }
@@ -42,7 +46,7 @@ struct DefaultAnalyticsParameterService: AnalyticsParameterService {
                 description: form.description,
                 type: type,
                 isOptional: form.isOptional,
-                analyticsEventID: form.eventID
+                analyticsEventID: eventID
             ).save(on: request).toForm()
         }
     }

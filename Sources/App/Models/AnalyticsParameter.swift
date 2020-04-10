@@ -21,7 +21,6 @@ final class AnalyticsParameter: Object {
         let description: String
         let type: String
         let isOptional: Bool
-        let eventID: Int
 
         // MARK: - Initializers
 
@@ -31,7 +30,6 @@ final class AnalyticsParameter: Object {
             self.description = analyticsParameter.description
             self.type = analyticsParameter.type.rawValue
             self.isOptional = analyticsParameter.isOptional
-            self.eventID = analyticsParameter.analyticsEventID
         }
     }
 
