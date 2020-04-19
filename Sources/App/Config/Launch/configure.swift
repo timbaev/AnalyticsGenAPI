@@ -1,19 +1,15 @@
-import Leaf
+import Fluent
+import FluentPostgresDriver
 import Vapor
-import FluentPostgreSQL
 
-/// Called before your application initializes.
-public func configure(_ config: inout Config, _ env: inout Environment, _ services: inout Services) throws {
+// Called before your application initializes.
+public func configure(_ app: Application) throws {
 
     // MARK: - Roter
 
-    let router = EngineRouter.default()
-    try routes(router)
-    services.register(router, as: Router.self)
+    try routes(app)
 
     // MARK: - Middleware
-
-    var middleware = MiddlewareConfig()
 
     let corsConfiguration = CORSMiddleware.Configuration(
         allowedOrigin: .all,
@@ -24,75 +20,37 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
     )
 
     let corsMiddleware = CORSMiddleware(configuration: corsConfiguration)
+    let fileMiddleware = FileMiddleware(publicDirectory: "Public")
+    let errorMiddleware = ErrorMiddleware.default(environment: app.environment)
 
-    middleware.use(corsMiddleware)
-    middleware.use(FileMiddleware.self)
-    middleware.use(ErrorMiddleware.self)
-
-    services.register(middleware)
+    app.middleware.use(corsMiddleware)
+    app.middleware.use(fileMiddleware)
+    app.middleware.use(errorMiddleware)
 
     // MARK: - PostgreSQL
 
-    try services.register(FluentPostgreSQLProvider())
+    let postgresConfiguration: PostgresConfiguration
 
-    let databaseName = (env == .testing) ? "analytics_gen_test" : "analytics_gen"
-
-    let postgresqlConfig: PostgreSQLDatabaseConfig
-
-    if let databaseURL = Environment.DATABASE_URL {
-        guard let config = PostgreSQLDatabaseConfig(url: databaseURL) else {
-            throw Abort(.internalServerError, reason: "Incorrect database URL")
-        }
-
-        postgresqlConfig = config
+    if let rawDatabaseURL = Environment.DATABASE_URL,
+       let databaseURL = URL(string: rawDatabaseURL),
+       let configuration = PostgresConfiguration(url: databaseURL) {
+        postgresConfiguration = configuration
     } else {
-        postgresqlConfig = PostgreSQLDatabaseConfig(
+        postgresConfiguration = PostgresConfiguration(
             hostname: "127.0.0.1",
             port: 5432,
             username: "postgres",
-            database: databaseName,
-            password: "qwe"
+            password: "qwe",
+            database: "analytics_gen"
         )
     }
 
-    let postgres = PostgreSQLDatabase(config: postgresqlConfig)
-
-    var databases = DatabasesConfig()
-
-    databases.enableLogging(on: .psql)
-    databases.add(database: postgres, as: .psql)
-
-    services.register(databases)
+    app.databases.use(.postgres(configuration: postgresConfiguration), as: .psql)
 
     // MARK: - Migrations
 
-    var migrations = MigrationConfig()
-
-    migrations.add(model: AnalyticsTracker.self, database: .psql)
-    migrations.add(model: AnalyticsEvent.self, database: .psql)
-    migrations.add(model: AnalyticsParameter.self, database: .psql)
-    migrations.add(model: AnalyticsTrackerEvent.self, database: .psql)
-
-    migrations.add(migration: AnalyticsParameter.ParameterType.self, database: .psql)
-    migrations.add(migration: AnalyticsTrackerMigration17022020.self, database: .psql)
-    migrations.add(migration: AnalyticsParameterMigration17022020.self, database: .psql)
-
-    services.register(migrations)
-
-    // MARK: - Commands
-
-    var commands = CommandConfig.default()
-    commands.useFluentCommands()
-
-    services.register(commands)
-
-    // MARK: - NIOServerConfig
-
-    services.register(NIOServerConfig.default(maxBodySize: 20_000_000))
-
-    // MARK: - LeafProvider
-
-    try services.register(LeafProvider())
-
-    config.prefer(LeafRenderer.self, for: ViewRenderer.self)
+    app.migrations.add(CreateEvent())
+    app.migrations.add(CreateParameter())
+    app.migrations.add(CreateTracker())
+    app.migrations.add(CreateTrackerEvent())
 }

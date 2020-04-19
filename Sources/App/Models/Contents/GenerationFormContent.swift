@@ -11,6 +11,6 @@ struct GenerationFormContent: Content {
 
     // MARK: - Instance Properties
 
-    let trackers: [AnalyticsTracker.Form]
-    let events: [AnalyticsEvent.GenForm]
+    let trackers: [Tracker.Form]
+    let events: [Event.GenForm]
 }
