@@ -22,6 +22,10 @@ final class EventController {
     private func update(on request: Request, form: Event.UpdateForm, eventID: UUID) -> EventLoopFuture<Event.Form> {
         request.eventService.update(on: request, form: form, eventID: eventID)
     }
+
+    private func fetch(on request: Request, eventID: UUID) -> EventLoopFuture<Event.Form> {
+        request.eventService.fetch(on: request, eventID: eventID)
+    }
 }
 
 // MARK: - RouteCollection
@@ -48,6 +52,12 @@ extension EventController: RouteCollection {
             let id = try request.parameters.get("id", as: UUID.self).unwrap(or: Abort(.badRequest))
 
             return self.update(on: request, form: form, eventID: id)
+        })
+
+        group.get(":id", use: { request -> EventLoopFuture<Event.Form> in
+            let id = try request.parameters.get("id", as: UUID.self).unwrap(or: Abort(.badRequest))
+
+            return self.fetch(on: request, eventID: id)
         })
     }
 }

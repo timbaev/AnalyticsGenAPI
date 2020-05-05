@@ -103,6 +103,10 @@ struct DefaultEventService: EventService {
         Event.query(on: request.db).with(\.$parameters).with(\.$trackers).all().mapEach { $0.toForm() }
     }
 
+    func fetch(on request: Request, eventID: UUID) -> EventLoopFuture<Event.Form> {
+        self.findWithRelationships(on: request, eventID: eventID).toForm()
+    }
+
     func update(on request: Request, form: Event.UpdateForm, eventID: UUID) -> EventLoopFuture<Event.Form> {
         self.findWithRelationships(on: request, eventID: eventID).throwingFlatMap { event in
             event.name = form.name
