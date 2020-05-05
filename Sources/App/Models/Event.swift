@@ -52,6 +52,20 @@ final class Event: Model {
 
     // MARK: -
 
+    struct UpdateForm: Content {
+
+        // MARK: - Instance Properties
+
+        let name: String
+        let description: String
+        let trackerIDs: [UUID]
+        let updateParameters: [Parameter.UpdateForm]?
+        let deleteParameters: [UUID]?
+        let createParameters: [Parameter.Form]?
+    }
+
+    // MARK: -
+
     struct GenForm: Content {
 
         // MARK: - Instance Properties

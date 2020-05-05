@@ -13,4 +13,5 @@ protocol EventService {
 
     func create(on request: Request, form: Event.CreateForm) -> EventLoopFuture<Event.Form>
     func fetch(on request: Request) -> EventLoopFuture<[Event.Form]>
+    func update(on request: Request, form: Event.UpdateForm, eventID: UUID) -> EventLoopFuture<Event.Form>
 }

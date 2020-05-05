@@ -17,7 +17,7 @@ final class Parameter: Model {
 
         // MARK: - Instance Properties
 
-        let id: String?
+        let id: UUID?
         let name: String
         let description: String
         let type: String
@@ -26,12 +26,25 @@ final class Parameter: Model {
         // MARK: - Initializers
 
         init(parameter: Parameter) {
-            self.id = parameter.id?.uuidString
+            self.id = parameter.id
             self.name = parameter.name
             self.description = parameter.description
             self.type = parameter.type.rawValue
             self.isOptional = parameter.isOptional
         }
+    }
+
+    // MARK: -
+
+    struct UpdateForm: Content {
+
+        // MARK: - Instance Properties
+
+        let id: UUID
+        let name: String
+        let description: String
+        let type: ParameterType
+        let isOptional: Bool
     }
 
     // MARK: - Type Properties

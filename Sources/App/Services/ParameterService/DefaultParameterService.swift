@@ -54,4 +54,21 @@ struct DefaultParameterService: ParameterService {
     func fetch(on request: Request) -> EventLoopFuture<[Event.Form]> {
         Event.query(on: request.db).with(\.$parameters).with(\.$trackers).all().mapEach { $0.toForm() }
     }
+
+    func update(
+        on request: Request,
+        parameter: Parameter,
+        form: Parameter.UpdateForm
+    ) -> EventLoopFuture<Parameter.Form> {
+        parameter.name = form.name
+        parameter.description = form.description
+        parameter.type = form.type
+        parameter.isOptional = form.isOptional
+
+        return parameter.save(on: request.db).transform(to: parameter.toForm())
+    }
+
+    func delete(on request: Request, parameters: [Parameter]) -> EventLoopFuture<Void> {
+        parameters.map { $0.delete(on: request.db) }.flatten(on: request.eventLoop)
+    }
 }
