@@ -15,7 +15,7 @@ struct CreateTrackerEvent: Migration {
         database.schema(TrackerEvent.schema)
             .id()
             .field(TrackerEvent.Fields.trackerID, .uuid, .required, .references(Tracker.schema, .id))
-            .field(TrackerEvent.Fields.eventID, .uuid, .required, .references(Event.schema, .id))
+            .field(TrackerEvent.Fields.eventID, .uuid, .required, .references(Event.schema, .id, onDelete: .cascade))
             .create()
     }
 

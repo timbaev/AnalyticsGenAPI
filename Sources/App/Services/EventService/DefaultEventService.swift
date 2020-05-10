@@ -141,4 +141,8 @@ struct DefaultEventService: EventService {
             self.findWithRelationships(on: request, eventID: eventID).map { $0.toForm() }
         }
     }
+
+    func delete(on request: Request, eventID: UUID) -> EventLoopFuture<Void> {
+        self.findWithRelationships(on: request, eventID: eventID).flatMap { $0.delete(on: request.db) }
+    }
 }

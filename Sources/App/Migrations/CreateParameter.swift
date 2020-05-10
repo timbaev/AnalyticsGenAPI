@@ -23,7 +23,7 @@ struct CreateParameter: Migration {
                 .field(Parameter.Fields.description, .string, .required)
                 .field(Parameter.Fields.type, enumType, .required)
                 .field(Parameter.Fields.isOptional, .bool, .required)
-                .field(Parameter.Fields.eventID, .uuid, .references(Event.schema, .id))
+                .field(Parameter.Fields.eventID, .uuid, .references(Event.schema, .id, onDelete: .cascade))
                 .create()
         }
     }

@@ -26,6 +26,12 @@ final class EventController {
     private func fetch(on request: Request, eventID: UUID) -> EventLoopFuture<Event.Form> {
         request.eventService.fetch(on: request, eventID: eventID)
     }
+
+    private func delete(on request: Request, eventID: UUID) -> EventLoopFuture<[Event.Form]> {
+        request.eventService.delete(on: request, eventID: eventID).flatMap {
+            request.eventService.fetch(on: request)
+        }
+    }
 }
 
 // MARK: - RouteCollection
@@ -58,6 +64,12 @@ extension EventController: RouteCollection {
             let id = try request.parameters.get("id", as: UUID.self).unwrap(or: Abort(.badRequest))
 
             return self.fetch(on: request, eventID: id)
+        })
+
+        group.delete(":id", use: { request -> EventLoopFuture<[Event.Form]> in
+            let id = try request.parameters.get("id", as: UUID.self).unwrap(or: Abort(.badRequest))
+
+            return self.delete(on: request, eventID: id)
         })
     }
 }
