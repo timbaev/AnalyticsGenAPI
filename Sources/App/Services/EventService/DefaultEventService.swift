@@ -98,7 +98,9 @@ struct DefaultEventService: EventService {
         }.flatMap { (eventID: Event.IDValue) in
             self.findWithRelationships(on: request, eventID: eventID)
         }.flatMapThrowing { event in
-            try self.emailService.sendEventCreatedEmail(on: request, event: event).transform(to: event)
+            try self.emailService
+                .sendEventChangedEmail(on: request, event: event, subject: "Новое событие")
+                .transform(to: event)
         }.flatMap { event in
             event.toForm()
         }
@@ -143,11 +145,21 @@ struct DefaultEventService: EventService {
 
             return futures.flatten(on: request.eventLoop).transform(to: event)
         }.flatMap { (event: Event) in
-            self.findWithRelationships(on: request, eventID: eventID).map { $0.toForm() }
+            self.findWithRelationships(on: request, eventID: eventID)
+        }.flatMapThrowing { event in
+            try self.emailService
+                .sendEventChangedEmail(on: request, event: event, subject: "Событие изменено")
+                .transform(to: event)
+        }.flatMap { event in
+            event.toForm()
         }
     }
 
     func delete(on request: Request, eventID: UUID) -> EventLoopFuture<Void> {
-        self.findWithRelationships(on: request, eventID: eventID).flatMap { $0.delete(on: request.db) }
+        self.findWithRelationships(on: request, eventID: eventID).throwingFlatMap { event in
+            try self.emailService.sendEventDeletedEmail(on: request, event: event).transform(to: event)
+        }.flatMap { event in
+            event.delete(on: request.db)
+        }
     }
 }

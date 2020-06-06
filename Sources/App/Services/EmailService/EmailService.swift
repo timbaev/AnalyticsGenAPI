@@ -11,6 +11,6 @@ protocol EmailService {
 
     // MARK: - Instance Methods
 
-    @discardableResult
-    func sendEventCreatedEmail(on request: Request, event: Event) throws -> EventLoopFuture<Void>
+    func sendEventChangedEmail(on request: Request, event: Event, subject: String) throws -> EventLoopFuture<Void>
+    func sendEventDeletedEmail(on request: Request, event: Event) throws -> EventLoopFuture<Void>
 }

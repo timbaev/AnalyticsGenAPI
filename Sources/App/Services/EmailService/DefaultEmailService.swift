@@ -14,9 +14,33 @@ struct DefaultEmailService: EmailService {
 
     let templateRenderer: TemplateRenderer
 
+    // MARK: - Instance Methods
+
+    private func send(on request: Request, body: String, subject: String) throws -> EventLoopFuture<Void> {
+        let email = try Email(
+            from: .senderEmailAddress(),
+            to: [.developerAddress()],
+            subject: subject,
+            body: body,
+            isBodyHtml: true
+        )
+
+        return request.smtp.send(email).map { result in
+            switch result {
+            case .success:
+                request.logger.info("sendEventCreatedEmail() -> Success")
+
+            case .failure(let error):
+                request.logger.error("sendEventCreatedEmail() -> Error: \(error)")
+            }
+
+            return Void()
+        }
+    }
+
     // MARK: - EmailService
 
-    func sendEventCreatedEmail(on request: Request, event: Event) throws -> EventLoopFuture<Void> {
+    func sendEventChangedEmail(on request: Request, event: Event, subject: String) throws -> EventLoopFuture<Void> {
         let parameters = event.parameters.map { parameter in
             """
             Название: \(parameter.name)<br>
@@ -37,27 +61,19 @@ struct DefaultEmailService: EmailService {
             on: request,
             templateName: "EventTable",
             context: context
-        ).throwingFlatMap { body -> EventLoopFuture<Result<Bool, Error>> in
-            let email = try Email(
-                from: .senderEmailAddress(),
-                to: [.developerAddress()],
-                subject: "Новое событие",
-                body: body,
-                isBodyHtml: true
-            )
+        ).flatMapThrowing { body in
+            try self.send(on: request, body: body, subject: subject)
+        }.transform(to: Void())
+    }
 
-            return request.smtp.send(email)
-        }.map { result in
-            switch result {
-            case .success:
-                request.logger.info("sendEventCreatedEmail() -> Success")
+    func sendEventDeletedEmail(on request: Request, event: Event) throws -> EventLoopFuture<Void> {
+        let context = DeletedEventContext(eventName: event.name)
 
-            case .failure(let error):
-                request.logger.error("sendEventCreatedEmail() -> Error: \(error)")
-            }
-
-            return Void()
-        }
+        return self.templateRenderer
+            .render(on: request, templateName: "EventDeleted", context: context)
+            .flatMapThrowing { body in
+                try self.send(on: request, body: body, subject: "Событие удалено")
+            }.transform(to: Void())
     }
 }
 
