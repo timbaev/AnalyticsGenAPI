@@ -14,6 +14,7 @@ struct DefaultEventService: EventService {
     // MARK: - Instance Properties
 
     let parameterService: ParameterService
+    let emailService: EmailService
 
     // MARK: - Instance Methods
 
@@ -95,7 +96,11 @@ struct DefaultEventService: EventService {
 
             return tracketEventFuture.and(parameterFuture).transform(to: eventID)
         }.flatMap { (eventID: Event.IDValue) in
-            self.findWithRelationships(on: request, eventID: eventID).map { $0.toForm() }
+            self.findWithRelationships(on: request, eventID: eventID)
+        }.flatMapThrowing { event in
+            try self.emailService.sendEventCreatedEmail(on: request, event: event).transform(to: event)
+        }.flatMap { event in
+            event.toForm()
         }
     }
 

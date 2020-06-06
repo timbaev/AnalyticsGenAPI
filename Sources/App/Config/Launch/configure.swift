@@ -1,6 +1,8 @@
 import Fluent
 import FluentPostgresDriver
 import Vapor
+import Smtp
+import Leaf
 
 // Called before your application initializes.
 public func configure(_ app: Application) throws {
@@ -20,7 +22,7 @@ public func configure(_ app: Application) throws {
     )
 
     let corsMiddleware = CORSMiddleware(configuration: corsConfiguration)
-    let fileMiddleware = FileMiddleware(publicDirectory: "Public")
+    let fileMiddleware = FileMiddleware(publicDirectory: app.directory.publicDirectory)
     let errorMiddleware = ErrorMiddleware.default(environment: app.environment)
 
     app.middleware.use(corsMiddleware)
@@ -53,4 +55,15 @@ public func configure(_ app: Application) throws {
     app.migrations.add(CreateParameter())
     app.migrations.add(CreateTracker())
     app.migrations.add(CreateTrackerEvent())
+
+    // MARK: - SMTP
+
+    app.smtp.configuration.hostname = "smtp.gmail.com"
+    app.smtp.configuration.secure = .ssl
+    app.smtp.configuration.username = try Environment.smtpEmail()
+    app.smtp.configuration.password = try Environment.smtpPassword()
+
+    // MARK: - Leaf
+
+    app.leaf.cache.isEnabled = app.environment.isRelease
 }

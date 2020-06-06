@@ -14,4 +14,8 @@ extension Abort {
     static func notFound<Model, ID: CustomStringConvertible>(model: Model.Type, for id: ID) -> Abort {
         Abort(.badRequest, reason: "\(model) with id '\(id)' not found")
     }
+
+    static func requiredEnvironmentVariable(_ variable: String) -> Abort {
+        Abort(.internalServerError, reason: "\(variable) environment variable is required")
+    }
 }

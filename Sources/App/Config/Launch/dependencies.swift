@@ -12,7 +12,7 @@ extension Request {
     // MARK: - Instance Properties
 
     var eventService: EventService {
-        DefaultEventService(parameterService: self.parameterService)
+        DefaultEventService(parameterService: self.parameterService, emailService: self.emailService)
     }
 
     var parameterService: ParameterService {
@@ -21,5 +21,13 @@ extension Request {
 
     var trackerService: TrackerService {
         DefaultTrackerService()
+    }
+
+    var emailService: EmailService {
+        DefaultEmailService(templateRenderer: self.templateRenderer)
+    }
+
+    var templateRenderer: TemplateRenderer {
+        HTMLTemplateRenderer()
     }
 }
